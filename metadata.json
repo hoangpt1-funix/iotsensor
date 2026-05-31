@@ -1,0 +1,6 @@
+{
+  "name": "EcoSync",
+  "description": "An intelligent, high-fidelity resource and energy synchronization dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
