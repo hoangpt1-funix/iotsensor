@@ -25,19 +25,16 @@ export default function DashboardTab({
   // Active systems drawing power count
   const activeSystems = appliances.filter((a) => a.isActive).length;
 
-  // Outer circle SVG details (radius 44)
-  const outerRadius = 44;
-  const outerCircumference = 2 * Math.PI * outerRadius; // Approx 276.46
+  const gaugeRadius = 42;
+  const gaugeCircumference = 2 * Math.PI * gaugeRadius; // Approx 263.89
+
   const maxEnergyAnchor = 25; // standard base scale
   const energyPercent = Math.min((energyUsed / maxEnergyAnchor) * 100, 100);
-  const outerOffset = outerCircumference - (energyPercent / 100) * outerCircumference;
+  const energyOffset = gaugeCircumference - (energyPercent / 100) * gaugeCircumference;
 
-  // Inner circle SVG details (radius 34)
-  const innerRadius = 34;
-  const innerCircumference = 2 * Math.PI * innerRadius; // Approx 213.63
   const maxWaterAnchor = 500;
   const waterPercent = Math.min((waterUsed / maxWaterAnchor) * 100, 100);
-  const innerOffset = innerCircumference - (waterPercent / 100) * innerCircumference;
+  const waterOffset = gaugeCircumference - (waterPercent / 100) * gaugeCircumference;
 
   const handleScheduleToggle = () => {
     setScheduled(!scheduled);
@@ -77,78 +74,93 @@ export default function DashboardTab({
   return (
     <div className="space-y-10 animate-in fade-in duration-300">
       {/* Centerpiece Display Dial */}
-      <section className="flex flex-col items-center">
-        <div className="relative w-72 h-72 md:w-80 md:h-80 flex items-center justify-center">
-          {/* Shadow Glow layer */}
-          <div className="absolute inset-0 rounded-full bg-green-500/5 blur-3xl" />
+      <section className="flex flex-col items-center w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl justify-items-center">
           
-          {/* Outer Energy Circle (Green) */}
-          <svg className="absolute w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-            {/* Energy Base track */}
-            <circle
-              className="text-gray-100"
-              cx="50"
-              cy="50"
-              fill="transparent"
-              r={outerRadius}
-              stroke="currentColor"
-              strokeWidth="5"
-            />
-            {/* Active high-contrast track */}
-            <circle
-              className="text-green-500 transition-all duration-1000 ease-out"
-              cx="50"
-              cy="50"
-              fill="transparent"
-              r={outerRadius}
-              stroke="currentColor"
-              strokeDasharray={outerCircumference}
-              strokeDashoffset={outerOffset}
-              strokeLinecap="round"
-              strokeWidth="5.5"
-            />
-          </svg>
+          {/* Energy Gauge */}
+          <div className="relative w-64 h-64 flex items-center justify-center p-4 bg-white border border-gray-100 rounded-3xl shadow-xs transition-transform hover:scale-[1.01]">
+            <div className="absolute inset-0 rounded-full bg-green-500/5 blur-2xl" />
+            
+            <svg className="absolute w-11/12 h-11/12 -rotate-90 transform" viewBox="0 0 100 100">
+              <circle
+                className="text-gray-100"
+                cx="50"
+                cy="50"
+                fill="transparent"
+                r={gaugeRadius}
+                stroke="currentColor"
+                strokeWidth="5.5"
+              />
+              <circle
+                className="text-green-500 transition-all duration-1000 ease-out"
+                cx="50"
+                cy="50"
+                fill="transparent"
+                r={gaugeRadius}
+                stroke="currentColor"
+                strokeDasharray={gaugeCircumference}
+                strokeDashoffset={energyOffset}
+                strokeLinecap="round"
+                strokeWidth="6"
+              />
+            </svg>
 
-          {/* Inner Water Circle (Blue) */}
-          <svg className="absolute w-[80%] h-[80%] -rotate-90 transform" viewBox="0 0 100 100">
-            {/* Water track background */}
-            <circle
-              className="text-blue-50/70"
-              cx="50"
-              cy="50"
-              fill="transparent"
-              r={innerRadius}
-              stroke="currentColor"
-              strokeWidth="6"
-            />
-            {/* Water Flow Active track */}
-            <circle
-              className="text-blue-600 transition-all duration-1005 ease-out"
-              cx="50"
-              cy="50"
-              fill="transparent"
-              r={innerRadius}
-              stroke="currentColor"
-              strokeDasharray={innerCircumference}
-              strokeDashoffset={innerOffset}
-              strokeLinecap="round"
-              strokeWidth="6.5"
-            />
-          </svg>
-
-          {/* Central text display metrics */}
-          <div className="z-10 text-center select-none">
-            <div className="font-headline text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
-              {energyUsed.toFixed(1)}
-            </div>
-            <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-              kWh Today
-            </div>
-            <div className="mt-4 flex items-center justify-center gap-1.5 text-blue-605 font-bold">
-              <Droplet className="w-4 h-4 fill-blue-500 stroke-blue-600 animate-bounce duration-1000" />
-              <span className="font-headline text-xl text-blue-700">{waterUsed}L</span>
+            <div className="z-10 text-center select-none space-y-1">
+              <div className="flex items-center justify-center text-green-650 gap-1.5 mb-1 bg-green-50/50 px-3 py-1 rounded-full border border-green-100/30">
+                <Zap className="w-4 h-4 fill-green-500 stroke-green-600" />
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-green-800">Energy used</span>
+              </div>
+              <div className="font-headline text-4xl font-extrabold text-gray-900 tracking-tight leading-none animate-pulse">
+                {energyUsed.toFixed(1)}
+              </div>
+              <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                kWh Today
+              </div>
             </div>
           </div>
+
+          {/* Water Gauge */}
+          <div className="relative w-64 h-64 flex items-center justify-center p-4 bg-white border border-gray-100 rounded-3xl shadow-xs transition-transform hover:scale-[1.01]">
+            <div className="absolute inset-0 rounded-full bg-blue-500/5 blur-2xl" />
+            
+            <svg className="absolute w-11/12 h-11/12 -rotate-90 transform" viewBox="0 0 100 100">
+              <circle
+                className="text-blue-50/50"
+                cx="50"
+                cy="50"
+                fill="transparent"
+                r={gaugeRadius}
+                stroke="currentColor"
+                strokeWidth="5.5"
+              />
+              <circle
+                className="text-blue-600 transition-all duration-1000 ease-out"
+                cx="50"
+                cy="50"
+                fill="transparent"
+                r={gaugeRadius}
+                stroke="currentColor"
+                strokeDasharray={gaugeCircumference}
+                strokeDashoffset={waterOffset}
+                strokeLinecap="round"
+                strokeWidth="6"
+              />
+            </svg>
+
+            <div className="z-10 text-center select-none space-y-1">
+              <div className="flex items-center justify-center text-blue-650 gap-1.5 mb-1 bg-blue-50/50 px-3 py-1 rounded-full border border-blue-100/30">
+                <Droplet className="w-3.5 h-3.5 fill-blue-500 stroke-blue-600 animate-bounce duration-1000" />
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-blue-805 text-blue-800">Water used</span>
+              </div>
+              <div className="font-headline text-4xl font-extrabold text-gray-900 tracking-tight leading-none">
+                {waterUsed}
+              </div>
+              <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                Liters Today
+              </div>
+            </div>
+          </div>
+
         </div>
 
         {/* Info stats block */}
